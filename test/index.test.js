@@ -13,6 +13,7 @@ describe('test/index.test.js', () => {
       rimraf(path.join(__dirname, 'fixtures/apps/rpc/run')),
       rimraf(path.join(__dirname, 'fixtures/apps/rpc/app/proxy')),
       rimraf(path.join(__dirname, 'fixtures/apps/rpc/run')),
+      rimraf(path.join(__dirname, 'fixtures/apps/keepCase/run')),
     ]);
   });
 
@@ -72,5 +73,23 @@ describe('test/index.test.js', () => {
       baseDir: './',
     });
     assert(generator.baseDir === process.cwd());
+  });
+
+  it('should support keep case', async function() {
+    const generator = new EggRpcGenerator({
+      baseDir: path.join(__dirname, 'fixtures/apps/keepCase'),
+      keepCase: true,
+    });
+    await generator.execute();
+
+    let isExist = await fs.exists(path.join(__dirname, 'fixtures/apps/keepCase/app/proxy/ProtoService.js'));
+    assert(isExist);
+    isExist = await fs.exists(path.join(__dirname, 'fixtures/apps/keepCase/run/proto.json'));
+    assert(isExist);
+
+    const actual = await fs.readFile(path.join(__dirname, 'fixtures/apps/keepCase/run/proto.json'), 'utf8');
+    const expect = await fs.readFile(path.join(__dirname, 'fixtures/expect/keepCaseProto.json'), 'utf8');
+
+    assert(actual === expect);
   });
 });
